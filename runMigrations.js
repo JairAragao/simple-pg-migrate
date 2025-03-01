@@ -17,13 +17,13 @@ async function runMigrations(direction = 'up', targetVersion = null) {
     await client.query('BEGIN');
 
     // Cria a tabela de controle de migrations se não existir
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS migrations (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    // await client.query(`
+    //   CREATE TABLE IF NOT EXISTS migrations (
+    //     id SERIAL PRIMARY KEY,
+    //     name VARCHAR(255) NOT NULL,
+    //     executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    //   )
+    // `);
 
     // Obtém todas as migrations aplicadas
     const appliedMigrations = await client.query('SELECT name FROM migrations ORDER BY executed_at DESC');

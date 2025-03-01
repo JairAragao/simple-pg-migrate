@@ -1,0 +1,22 @@
+{
+  "name": "simple-pg-migrate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "runMigrations.js",
+  "scripts": {
+    "migrate:up": "node runMigrations.js up",
+    "migrate:down": "node runMigrations.js down"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JairAragao/simple-pg-migrate.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "pg-promise": "^11.10.2"
+  }
+}

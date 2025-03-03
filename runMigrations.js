@@ -16,18 +16,12 @@ async function runMigrations(direction = 'up', targetVersion = null) {
   try {
     await client.query('BEGIN');
 
-    // Cria a tabela de controle de migrations se não existir
-    // await client.query(`
-    //   CREATE TABLE IF NOT EXISTS migrations (
-    //     id SERIAL PRIMARY KEY,
-    //     name VARCHAR(255) NOT NULL,
-    //     executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    //   )
-    // `);
+    const migrationsTable = process.env.MIGRATIONS_TABLE || 'migrations';
 
     // Obtém todas as migrations aplicadas
-    const appliedMigrations = await client.query('SELECT name FROM migrations ORDER BY executed_at DESC');
-    const appliedMigrationNames = appliedMigrations.rows.map(row => row.name);
+    const nameColumn = process.env.MIGRATIONS_NAME_COLUMN || 'name';
+    const appliedMigrations = await client.query(`SELECT ${nameColumn} FROM ${migrationsTable} ORDER BY executed_at DESC`);
+    const appliedMigrationNames = appliedMigrations.rows.map(row => row[nameColumn]);
 
     let migrationFiles = fs.readdirSync(path.join(__dirname, 'migrations'))
       .filter(file => file.endsWith(`_${direction}.sql`))
@@ -70,13 +64,13 @@ async function runMigrations(direction = 'up', targetVersion = null) {
         console.log(`Executing migration: ${file}`);
         const sql = fs.readFileSync(path.join(__dirname, 'migrations', file), 'utf8');
         await client.query(sql);
-        await client.query('INSERT INTO migrations (name) VALUES ($1)', [migrationName]);
+        await client.query(`INSERT INTO ${migrationsTable} (${nameColumn}) VALUES (${migrationName})`);
         console.log(`Migration ${file} executed successfully.`);
       } else if (direction === 'down') {
         console.log(`Reverting migration: ${file}`);
         const sql = fs.readFileSync(path.join(__dirname, 'migrations', file), 'utf8');
         await client.query(sql);
-        await client.query('DELETE FROM migrations WHERE name = $1', [migrationName]);
+        await client.query(`DELETE FROM ${migrationsTable} WHERE ${nameColumn} = ${migrationName}`);
         console.log(`Migration ${file} reverted successfully.`);
       }
 

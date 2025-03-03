@@ -3,6 +3,26 @@ const path = require('path');
 const { Pool } = require('pg');
 require('dotenv').config();
 
+function validateEnvVars() {
+  const requiredVars = [
+    'DB_USER',
+    'DB_HOST',
+    'DB_NAME',
+    'DB_PASSWORD',
+    'DB_PORT',
+    'MIGRATIONS_TABLE',
+    'MIGRATIONS_NAME_COLUMN'
+  ];
+
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    const error = new Error();
+    error.message = `Variáveis de ambiente obrigatórias faltando: ${missingVars.join(', ')}`;
+    throw error;
+  }
+}
+
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -12,14 +32,13 @@ const pool = new Pool({
 });
 
 async function runMigrations(direction = 'up', targetVersion = null) {
+  validateEnvVars();
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    const migrationsTable = process.env.MIGRATIONS_TABLE || 'migrations';
-
-    // Obtém todas as migrations aplicadas
-    const nameColumn = process.env.MIGRATIONS_NAME_COLUMN || 'name';
+    const migrationsTable = process.env.MIGRATIONS_TABLE;
+    const nameColumn = process.env.MIGRATIONS_NAME_COLUMN;
     const appliedMigrations = await client.query(`SELECT ${nameColumn} FROM ${migrationsTable} ORDER BY executed_at DESC`);
     const appliedMigrationNames = appliedMigrations.rows.map(row => row[nameColumn]);
 
@@ -83,7 +102,17 @@ async function runMigrations(direction = 'up', targetVersion = null) {
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK');
-    console.error(`Error ${direction === 'up' ? 'executing' : 'reverting'} migrations:`, err);
+    const errorMessages = {
+      '42P01': 'Tabela não encontrada. Verifique se a tabela de migrations existe.',
+      '28P01': 'Falha na autenticação. Verifique usuário e senha do banco de dados.',
+      '3D000': 'Banco de dados não existe. Verifique o nome do banco configurado.',
+      'ENOTFOUND': 'Não foi possível conectar ao servidor do banco de dados.',
+      'default': `Erro ao ${direction === 'up' ? 'executar' : 'reverter'} migration`
+    };
+    
+    const errorCode = err.code || 'default';
+    const message = errorMessages[errorCode] || errorMessages['default'];
+    console.error(`ERRO: ${message}`);
   } finally {
     client.release();
   }

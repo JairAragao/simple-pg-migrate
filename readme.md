@@ -76,7 +76,7 @@ Onde XXX é o número da versão desejada.
 
 ## Funcionamento
 
-- O sistema mantém um registro das migrations aplicadas na tabela `migrations` do banco de dados.
+- O sistema mantém um registro das migrations aplicadas na tabela indicada na variável `MIGRATIONS_TABLE` do arquivo .env do banco de dados.
 - Ao aplicar migrations, o sistema executa apenas as migrations que ainda não foram aplicadas.
 - Ao reverter, o sistema reverte apenas as migrations que foram aplicadas, na ordem inversa de aplicação.
 - É possível especificar uma versão alvo tanto para aplicar quanto para reverter migrations.

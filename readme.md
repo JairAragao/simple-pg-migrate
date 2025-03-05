@@ -6,7 +6,7 @@ Um sistema simples e genérico de migrations para PostgreSQL. Permite aplicar e 
 
 1. Instale as dependências necessárias:
    ```bash
-   npm install pg dotenv
+   npm install
    ```
 
 2. Renomeie o arquivo `.env.exemple` para `.env` e configure as seguintes variáveis:
@@ -38,15 +38,6 @@ Exemplo:
 O prefixo numérico (XXX) determina a ordem de execução das migrations.
 
 ## Uso
-
-Adicione os seguintes scripts ao seu `package.json`:
-
-```json
-"scripts": {
-  "migrate:up": "node runMigrations.js up",
-  "migrate:down": "node runMigrations.js down"
-}
-```
 
 ### Aplicar Migrations
 

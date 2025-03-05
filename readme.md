@@ -9,18 +9,20 @@ Um sistema simples e genérico de migrations para PostgreSQL. Permite aplicar e 
    npm install pg dotenv
    ```
 
-2. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+2. Renomeie o arquivo `.env.exemple` para `.env` e configure as seguintes variáveis:
    ```
    DB_HOST=seu_host
    DB_PORT=sua_porta
    DB_NAME=nome_do_banco
    DB_USER=seu_usuario
    DB_PASSWORD=sua_senha
+   MIGRATIONS_TABLE=tabela_de_migrations
+   MIGRATIONS_NAME_COLUMN=coluna_com_nome_das_migrations
    ```
 
 3. Certifique-se de que o arquivo `runMigrations.js` está na raiz do seu projeto.
 
-4. Crie uma pasta `migrations` na raiz do projeto para armazenar seus arquivos de migration.
+4. A pasta `migrations` já contém arquivos de exemplo que demonstram o formato correto para criar suas próprias migrations. Você pode usá-los como referência e adicionar novos arquivos seguindo o mesmo padrão.
 
 ## Estrutura das Migrations
 
